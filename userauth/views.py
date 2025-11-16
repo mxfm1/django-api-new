@@ -22,6 +22,7 @@ class RegisterView(CreateAPIView):
 class LogoutView(APIView):
     def post(self,request):
         try:
+            self.permission_classes = [IsAuthenticated]
             refresh_token = request.data['refresh']
             token = RefreshToken(refresh_token)
             token.blacklist()
@@ -33,6 +34,9 @@ class ListUsersView(ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    def get_permissions(self):
+        self.permission_classes= [permissions.IsAdminUser]
+        return super().get_permissions()
     # def get_queryset(self):
     #     user = self.request.user
 
@@ -43,7 +47,7 @@ class ListUsersView(ListAPIView):
 class UserDetailView(RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,IsAdminUser]
     lookup_field="id"
     
     def get_object(self):
@@ -55,7 +59,6 @@ class UserDetailView(RetrieveUpdateDestroyAPIView):
     def destroy(self,request,*args,**kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
-
         return Response({
             "message":"Usuario eliminado con éxito"
         },status= status.HTTP_202_ACCEPTED)
