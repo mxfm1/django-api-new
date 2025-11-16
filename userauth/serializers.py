@@ -15,12 +15,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ("username", "password", "password2", "email", "first_name", "last_name")
         extra_kwargs = {
-            "username": {"validators": []}
+            "username": {"validators": []},
         }
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
             raise serializers.ValidationError({"password": "Las contraseñas no coinciden"})
+
+
+        required_fields = ["first_name","last_name","email"]
+        for field in required_fields:
+            if not attrs.get(field):
+                raise serializers.ValidationError({field: f"El campo {field} es obligatorio."})
         return attrs
     
     def validate_username(self, value):
