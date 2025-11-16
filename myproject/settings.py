@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import dj_database_url
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY=os.environ.get('SECRET_KEY', default='your secret key')
 
-
+APPEND_SLASH = False
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = 'RENDER' not in os.environ
@@ -33,6 +34,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'api',
+    'rest_framework.authtoken',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    "rest_framework_simplejwt.token_blacklist",
+    'userauth'
 ]
 
 MIDDLEWARE = [
@@ -76,6 +84,16 @@ DATABASES = {
     )
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -126,4 +144,19 @@ if not DEBUG:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ADMIN_EMAILS = ["adminexample@admin.com"]
+raw_admins = os.environ.get("ADMIN_EMAILS", "")
+ADMIN_EMAILS = raw_admins.split(",") if raw_admins else [
+    "adminexample@admin.com",
+    "admin@admin.com"
+]
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'djangojwtauth_cookie',
+    'JWT_AUTH_REFRESH_COOKIE': 'djangojwtauth_refresh_cookie' 
+}
