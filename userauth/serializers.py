@@ -43,10 +43,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data.get("last_name"),
             password=validated_data["password"]
         )
-
-        if user.email == settings.ADMIN_EMAILS:
-            user.is_staff(True)
-            user.is_superuser(True)
+        if user.email in settings.ADMIN_EMAILS:
+            user.is_staff = True
+            user.is_superuser = True
             user.save()
         return user
 
