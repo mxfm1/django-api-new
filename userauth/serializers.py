@@ -11,9 +11,18 @@ class RegisterSerializer(serializers.ModelSerializer):
     )
     password2 = serializers.CharField(write_only=True, required=True)
 
+    role = serializers.ChoiceField(
+        choices=[
+            ("common","Usuario comun"),
+            ("staff","Staff"),
+            ("admin","Administrador")
+        ],
+        required=False
+    )
+
     class Meta:
         model = User
-        fields = ("username", "password", "password2", "email", "first_name", "last_name")
+        fields = ("username", "password", "password2", "email", "first_name", "last_name","role")
         extra_kwargs = {
             "username": {"validators": []},
         }
@@ -36,6 +45,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password2")
+        role = validated_data.pop("role","common")
+
         user = User.objects.create_user(
             username=validated_data["username"],
             email=validated_data.get("email"),
@@ -46,8 +57,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         if user.email in settings.ADMIN_EMAILS:
             user.is_staff = True
             user.is_superuser = True
-            user.save()
+
+        if role == 'staff':
+            user.is_staff = True
+        elif role == "admin":
+            user.is_staff = True
+            user.is_superuser = True
+        else:
+            user.is_staff = False
+            user.is_superuser = False
+
+        user.save()
         return user
+    
 
 
 class UserSerializer(serializers.ModelSerializer):

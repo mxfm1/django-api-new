@@ -16,7 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 class RegisterView(CreateAPIView):
     queryset = User.objects.all()
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated,IsAdminUser]
     serializer_class = RegisterSerializer
 
 class LogoutView(APIView):
