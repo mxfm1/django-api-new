@@ -21,6 +21,11 @@ class Residence(models.Model):
         blank=True,
         related_name="created_by"
     )
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
+
+class ResidentProfile(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="resident_profile")
+    residence = models.ForeignKey(Residence,on_delete=models.SET_NULL,null=True,related_name="residents")
+
+    

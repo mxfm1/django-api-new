@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer, ValidationError
-from .models import Residence
+from .models import Residence,ResidentProfile
+from django.contrib.auth.models import User
 
 class ResidenceSerializer(ModelSerializer):
     class Meta:
@@ -31,3 +32,40 @@ class UpdateResidenceSerializer(ModelSerializer):
         if user.is_superuser:
             raise ValidationError("Un usuario administrador no puede ser dueño de una residencia")
         return user
+    
+class ListResidenceSerializer(ModelSerializer):
+    class Meta:
+        model = Residence
+        fields = ["identifier", "owner", "created_by", "created_at", "updated_at"]
+        read_only_fields = ["identifier", "created_by", "created_at", "updated_at"]
+
+
+class SimpleUserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name"]
+
+
+class ResidentProfileSerializer(ModelSerializer):
+    user = SimpleUserSerializer(read_only=True)
+     
+    class Meta:
+        model = ResidentProfile
+        fields = []
+
+    def to_representation(self, instance):
+        return SimpleUserSerializer(instance.user).data
+
+class ResidenceWithUsersSerializer(ModelSerializer):
+    residents = ResidentProfileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Residence
+        fields = [
+            "identifier",
+            "owner",
+            "created_by",
+            "created_at",
+            "updated_at",
+            "residents",
+        ]

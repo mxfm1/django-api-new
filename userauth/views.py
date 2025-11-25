@@ -5,7 +5,7 @@ from rest_framework import permissions
 from .serializers import (
     RegisterSerializer,
     UserSerializer,
-    CustomLoginSerializer
+    CustomLoginSerializer,
 )
 
 from django.http import Http404
@@ -14,6 +14,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser,IsAuthenticated,IsAuthenticatedOrReadOnly,AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+
 
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
@@ -25,9 +27,11 @@ class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
 
 class LogoutView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
     def post(self,request):
         try:
-            self.permission_classes = [IsAuthenticated]
             refresh_token = request.data['refresh']
             token = RefreshToken(refresh_token)
             token.blacklist()
