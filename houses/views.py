@@ -26,7 +26,7 @@ class CreateResidence(CreateAPIView):
 
 class ResidenceDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Residence.objects.all()
-    serializer_class = UpdateResidenceSerializer
+    serializer_class = ResidenceWithUsersSerializer
     permission_classes = [IsAuthenticated,CanManageHouses]
     lookup_field="identifier"
     lookup_url_kwarg = "identifier"
