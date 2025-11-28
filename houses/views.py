@@ -38,26 +38,36 @@ class ListResidence(ListAPIView):
 
 class AddResidentView(APIView):
     def post(self, request, identifier):
-        user_id = request.data.get("user_id")
+        user_ids = request.data.get("user_ids")
 
-        if not user_id:
-            return Response({"error": "user_id is required"}, status=400)
+        if not user_ids or not isinstance(user_ids,list):
+            return Response({
+                "error":"Error al asginar usuarios a la residencia"
+            },status=status.HTTP_400_BAD_REQUEST)
 
         # Buscar residencia
         residence = get_object_or_404(Residence, identifier=identifier)
 
-        # Buscar usuario
-        user = get_object_or_404(User, id=user_id)
+        assigned = []
+        not_Found = []
 
-        # Obtener o crear perfil
-        profile, created = ResidentProfile.objects.get_or_create(user=user)
+        for user_id in user_ids:
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                not_Found.append(user_id)
+                continue
 
-        # Asignar residencia
-        profile.residence = residence
-        profile.save()
+            profile, created = ResidentProfile.objects.get_or_create(user=user)
+
+            profile.residence = residence
+            profile.save()
+
+            assigned.append(user_id)
 
         return Response({
-            "message": "Resident assigned successfully",
-            "user_id": user.id,
+            "message": "Residentes añadidos con éxito",
+            "assigned": assigned,
+            "not_found": not_Found,
             "residence": residence.identifier,
         })
