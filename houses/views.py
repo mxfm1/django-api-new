@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
 from .models import Residence
-from .serializers import ResidenceSerializer, UpdateResidenceSerializer,ResidenceWithUsersSerializer
+from .serializers import ResidenceSerializer, UpdateResidenceSerializer,ResidenceWithUsersSerializer,UserDataSerializer
 from django.shortcuts import get_object_or_404
 
 from rest_framework.permissions import IsAuthenticated,AllowAny
@@ -71,3 +71,10 @@ class AddResidentView(APIView):
             "not_found": not_Found,
             "residence": residence.identifier,
         })
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        serializer =  UserDataSerializer(request.user)
+        return Response(serializer.data)

@@ -15,8 +15,6 @@ from rest_framework.permissions import IsAdminUser,IsAuthenticated,IsAuthenticat
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-
-
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
     serializer_class = CustomLoginSerializer
@@ -71,7 +69,3 @@ class UserDetailView(RetrieveUpdateDestroyAPIView):
         return Response({
             "message":"Usuario eliminado con éxito"
         },status= status.HTTP_202_ACCEPTED)
-
-
-
-    

@@ -128,3 +128,38 @@ class ResidenceWithUsersSerializer(ModelSerializer):
             ).update(residence=instance)
 
         return instance
+    
+
+class ResidenceMiniSerializer(ModelSerializer):
+    owner = SimpleUserSerializer(read_only=True)
+
+    class Meta:
+        model =Residence
+        fields = ["identifier","owner"]
+
+class UserDataSerializer(ModelSerializer):
+    residence = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "is_staff",
+            "is_superuser",
+            "residence"
+        ]
+
+    def get_residence(self, user):
+        try:
+            profile = user.resident_profile
+        except ResidentProfile.DoesNotExist:
+            return None
+
+        if not profile.residence:
+            return None
+
+        return ResidenceMiniSerializer(profile.residence).data
