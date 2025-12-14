@@ -15,4 +15,5 @@ urlpatterns = [
     path("api/token/refresh/",TokenRefreshView.as_view(),name="token_refresh"),
     path("api/auth/",include("userauth.urls")),
     path("api/houses/",include("houses.urls")),
+    path("api/invites/",include("invitations.urls"))
 ]
