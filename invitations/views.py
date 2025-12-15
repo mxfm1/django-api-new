@@ -33,3 +33,8 @@ class Invitations(ListAPIView):
         return Invitation.objects.filter(
             residence=residence
         )
+    
+class AllInvitations(ListAPIView):
+    serializer_class = InvitationSerializer
+    queryset = Invitation.objects.all()
+    permission_classes = [IsAuthenticated]
